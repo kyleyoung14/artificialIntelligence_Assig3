@@ -1,6 +1,5 @@
-#The class node
+#The class node holds info about the data points
 class Node:
-    def __init__(self, coordinates, clusterSize):
+    def __init__(self, coordinates):
         self.coordinates = coordinates
-        self.clusterSize = clusterSize
-        self.probability = [0] * clusterSize               #list of Probabilities of size cluster
+
