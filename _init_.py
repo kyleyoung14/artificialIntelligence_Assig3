@@ -26,10 +26,12 @@ def main():
     #Create the list of clusters
     clusters = []
     for id in xrange(clusterCnt):
-        clusters.append(Cluster(id))
+        clusters.append(Cluster(id, len(nodes[0].coordinates)))
 
     #Create the Data Class
-    Data(nodes,clusters)
+    allData = Data(nodes,clusters)
+
+    allData.ExpectedMax()
 
 
 
