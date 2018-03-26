@@ -2,7 +2,7 @@
 from random import random
 
 class Cluster:
-    def __init__(self, numNodes):
+    def __init__(self, id):
         #set the mean
         mean = random() * 150.0
         mean = mean - 75.0
@@ -10,11 +10,10 @@ class Cluster:
         #set the variance
         variance = random() * 10
 
+        #
         self.mean = mean
         self.variance = variance
-        self.probabilities = [0] * numNodes    #Probability Node i is in this cluster
+        self.id = id
+        self.member = 0
 
-    #Returns the probability that the given nodes comes from this cluster
-    def fromCluser(self, node):
-        print("setting prob")
 

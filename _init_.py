@@ -21,16 +21,12 @@ def main():
     #Create the list of nodes
     nodes = []
     for row in csv_file:
-        nodes.append(Node(row))
+        nodes.append(Node(row,clusterCnt))
 
     #Create the list of clusters
     clusters = []
-    numNodes = len(nodes)
-    for i in xrange(clusterCnt):
-        clusters.append(Cluster(numNodes))
-
-    print(nodes[0].coordinates[0])
-    print(clusters[0].mean)
+    for id in xrange(clusterCnt):
+        clusters.append(Cluster(id))
 
     #Create the Data Class
     Data(nodes,clusters)
