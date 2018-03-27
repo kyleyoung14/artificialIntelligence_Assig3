@@ -21,7 +21,10 @@ def main():
     #Create the list of nodes
     nodes = []
     for row in csv_file:
-        nodes.append(Node(row,clusterCnt))
+        numList = []
+        for num in row:
+            numList.append(float(num))
+        nodes.append(Node(numList,clusterCnt))
 
     #Create the list of clusters
     clusters = []
