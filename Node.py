@@ -11,12 +11,14 @@ class Node:
     def probFrom(self, clusters):
         # print("Checking the probability this node comes from cluster " + str(cluster.id))
         for cluster in clusters:
-            dist = 0
-            for i in xrange(cluster.numDim):
-                dist += (cluster.mean[i] - self.coordinates[i])**2
-
-            probMath = math.exp(-1 / (2*cluster.variance) * dist**2)
+            # dist = 0
+            # for i in xrange(cluster.numDim):
+            #     dist += (cluster.mean[i] - self.coordinates[i])**2
+            #
+            # probMath = math.exp(-1 / (2*cluster.variance) * dist**2)
+            probMath = 0
             self.probabilities[cluster.id] = probMath
+
         # Take the summation of all of the probabilities
         #FORMULA BASed on the pos,
         sumN = 0.0

@@ -32,6 +32,7 @@ def getMinList(nodes):
     coordSize = len(nodes[0].coordinates)
     for i in xrange(coordSize):
         currMin = nodes[0].coordinates[i]
+
         for node in nodes:
             curr = node.coordinates[i]
             if(curr < currMin):
@@ -42,9 +43,63 @@ def getMinList(nodes):
 
     return minList
 
+
 #Returns a list for the variance
 def getVarList(nodes):
     varList = []
+
+    #Get the sampleMean of all the coordinates to their respective slot
+    sampleMeanList = []
+    coordSize = len(nodes[0].coordinates)
+    numNodes = len(nodes)
+    for i in xrange(coordSize):
+        sum = 0
+        for node in nodes:
+            sum += node.coordinates[i]
+
+        #Get the sample mean for the respective coordinate
+        sampleMean = sum/numNodes
+        sampleMeanList.append(sampleMean)
+
+    print(sampleMeanList)
+
+    #get (x-xMean)^2
+    dateMinusSampleMS= [[0 for x in range(numNodes)] for y in range(coordSize)]
+    for i in xrange(coordSize):
+
+        for j in xrange(numNodes):
+            #Get x-xMean squared
+            val = nodes[j].coordinates[i] - sampleMeanList[i]
+            dateMinusSampleMS[i][j] = (val**2)
+
+    #Get the sum for each coord E((x-xMean)^2)
+    sumECoord = []
+    for i in xrange(coordSize):
+        sum = 0
+        for j in xrange(numNodes):
+            sum += dateMinusSampleMS[i][j]
+
+        sumECoord.append(sum)
+
+    #Set the variance for each coordinate
+    for i in xrange(coordSize):
+        variance = (sumECoord[i]/(numNodes-1))
+
+        varList.append(variance)
+
+    return varList
+
+
+
+
+
+
+
+
+
+
+
+
     return varList
 
 
