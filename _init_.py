@@ -97,14 +97,6 @@ def getVarList(nodes):
 
 
 
-
-
-
-    return varList
-
-
-
-
 #Main Function
 def main():
     print("Running EM")
@@ -120,14 +112,16 @@ def main():
 
     #Create the list of nodes
     nodes = []
+    numDim = 0
     for row in csv_file:
-        coordinates = []
 
         #Convert the strings to floats
         for i in row:
             coordinates.append(float(i))
 
-        nodes.append(Node(coordinates,clusterCnt))
+        numDim = len(row)
+
+        nodes.append(Node(coordinates,clusterCnt,numDim))
         print(coordinates)
 
     #Get the max and min from the nodes
@@ -142,7 +136,7 @@ def main():
     # #Create the list of clusters
     # clusters = []
     # for id in xrange(clusterCnt):
-    #     clusters.append(Cluster(id, len(nodes[0].coordinates), maxList,minList, varianceList))
+    #     clusters.append(Cluster(id, numDim), maxList,minList, varianceList))
     #
     # #Create the Data Class
     # allData = Data(nodes,clusters)
