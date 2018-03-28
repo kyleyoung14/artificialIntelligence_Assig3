@@ -1,6 +1,7 @@
 from Node import Node
 from Cluster import Cluster
 from Data import Data
+import copy
 
 import csv
 
@@ -89,8 +90,29 @@ def getVarList(nodes):
 
     return varList
 
+#Returns a list of initial cluster centers or means
+def getInitialCenters(maxList,minList,numDim,clusterCnt):
+    # Get 'average intervals' for each dimension
+    # used for cluster mean initialization
+    dim_intervals = []
+    for i in xrange(numDim):
+        interval = maxList[i] - minList[i] / (clusterCnt - 1)
+        print "interval ", i, "= ", interval
+        dim_intervals.append(interval)
 
-
+    # calculate initial 'means' or cluster centers
+    cluster_centers = []
+    for i in xrange(clusterCnt):
+        if i == 0:
+            cur_center = minList
+            print i, ":", cur_center
+        else:
+            for x, center in enumerate(cur_center):
+                cur_center[x] += dim_intervals[x]
+            print i, ":", cur_center
+        cluster_centers.append(copy.deepcopy(cur_center))
+    print "initial centers: ", cluster_centers
+    return cluster_centers
 
 
 
@@ -101,7 +123,7 @@ def getVarList(nodes):
 def main():
     print("Running EM")
 
-    #Take in input
+    # Input
     #dataFile = raw_input("Input data file name: ")
     dataFile = "sample_EM_data2.csv"
     clusterCnt = int(raw_input("Number of clusters: "))
@@ -112,13 +134,17 @@ def main():
 
     #Create the list of nodes
     nodes = []
+
     numDim = 0
+
+    #Create Nodes
     for row in csv_file:
+        coordinates = []
 
         #Convert the strings to floats
         for i in row:
             coordinates.append(float(i))
-
+        
         numDim = len(row)
 
         nodes.append(Node(coordinates,clusterCnt,numDim))
@@ -132,11 +158,16 @@ def main():
     varianceList = getVarList(nodes)
 
 
+    print "MaxList: ",maxList
+    print "MinList: ",minList
+    # Calculate initial centers or means
+    initial_centers = getInitialCenters(maxList,minList,numDim,clusterCnt)
 
     # #Create the list of clusters
     # clusters = []
     # for id in xrange(clusterCnt):
-    #     clusters.append(Cluster(id, numDim), maxList,minList, varianceList))
+    #     meanList = initial_centers[id]
+    #     clusters.append(Cluster(id, numDim,meanList), maxList,minList, varianceList))
     #
     # #Create the Data Class
     # allData = Data(nodes,clusters)
