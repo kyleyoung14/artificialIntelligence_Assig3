@@ -2,7 +2,7 @@
 from random import random
 
 class Cluster:
-    def __init__(self, id, numDim):
+    def __init__(self, id, numDim, maxList, minList, varianceList):
         #set the mean
         meanList = []
         for i in xrange(numDim):
@@ -11,11 +11,14 @@ class Cluster:
             meanList.append(mean)
 
         #set the variance
-        variance = random() * 10
+        for i in xrange(numDim):
+            variance = random() * 10
 
-        #
-        self.mean = meanList
-        self.variance = variance
+        #Take the variance of the entire distribution
+        #base the variance on the nodes var/#cluster
+        #PICK THE MEAN AND VARIANCE FORM THE NODES
+        self.mean = meanList        #Random
+        self.variance = variance    #Distribution
         self.id = id
         self.member = 0
         self.numDim = numDim

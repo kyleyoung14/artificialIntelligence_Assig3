@@ -18,6 +18,7 @@ class Node:
             probMath = math.exp(-1 / (2*cluster.variance) * dist**2)
             self.probabilities[cluster.id] = probMath
         # Take the summation of all of the probabilities
+        #FORMULA BASed on the pos,
         sumN = 0.0
         for prob in self.probabilities:
             sumN += prob
