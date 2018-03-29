@@ -39,4 +39,5 @@ class Data:
             self.setAllNodeProb()
             self.updateClusters()
             self.updateLogLL()
+            size = len(self.logLL)
 
