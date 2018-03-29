@@ -3,16 +3,15 @@ class Data:
     def __init__(self, nodes, clusters):
         self.nodes = nodes
         self.clusters = clusters
-        self.logLL = []
-        self.logLL.append(0)
-        self.logLL.append(0)
+        self.L = 0
+        self.logL = 0
 
 
     #Loops through all the nodes and sets their probability of being in part in all clusters (EXPECTATION)
     def setAllNodeProb(self):
         print("setting all clusters nodes")
 
-        #
+        # calculate probabilities
         for node in self.nodes:
             node.probFrom(self.clusters)
 
@@ -25,8 +24,20 @@ class Data:
 
 
     #Calculate the newest log LL
-    def updateLogLL(self):
-        pass
+    def updateLikelihood(self):
+        likelihood = 0
+        log_likelihood = 0
+
+        # calculate node likelihoods
+        for node in self.nodes:
+            node.calculateNodeL()
+
+        # calculate overall likelihoods
+        for node in self.nodes:
+            likelihood += node.L
+            log_likelihood += node.logL
+
+
 
     #This runs EM
     def ExpectedMax(self):
@@ -38,6 +49,6 @@ class Data:
         while(first or self.logLL[size-1]-self.logLL[size-2] > thresh):
             self.setAllNodeProb()
             self.updateClusters()
-            self.updateLogLL()
+            self.updateLikelihood()
             size = len(self.logLL)
 

@@ -180,12 +180,14 @@ def main():
     # Calculate initial centers or means
     initial_centers = getInitialCenters(maxList,minList,numDim,clusterCnt)
 
+    # calculate initial cluster probability
+    probability = 1/clusterCnt
 
     #Create the list of clusters
     clusters = []
     for id in xrange(clusterCnt):
         meanList = initial_centers[id]
-        clusters.append(Cluster(id, numDim,meanList, varianceList))
+        clusters.append(Cluster(id, numDim,meanList, varianceList, probability))
 
     #Create the Data Class
     #allData = Data(nodes,clusters)

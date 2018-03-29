@@ -8,12 +8,16 @@ class Node:
         self.probabilities = [0] * clusterNum
         for cluster in self.probabilities:
             cluster = [0] * numDim
-        self.cluster = 0
+        self.probabilities_unorm = [0] * clusterNum
+        self.probabilities_norm = [0] * clusterNum
+        self.L = 0
+        self.logL = 0
 
     #Does the math to check what is the probability that this nodes belongs to the given cluster
     def probFrom(self, clusters):
-        # print("Checking the probability this node comes from cluster " + str(cluster.id))
-        for n, cluster in enumerate(clusters):
+
+        # calculate probability that node is in this cluster per dimension
+        for cluster in clusters:
             for i in xrange(cluster.numDim):
                 # calculate probability for this cluster for this dimension
                 mean = cluster.meanList[i]
@@ -22,7 +26,37 @@ class Node:
                 # normalize
                 p_norm = norm.ppf(p,loc=mean,scale=stddev)
                 # update probabilities list
-                self.probabilities[n][i] = p_norm
+                self.probabilities[cluster.id][i] = p_norm
+
+        # calculate probability that node is from cluster (unorm)
+        probability = 1
+        for cluster in clusters:
+            for i in xrange(cluster.numDim):
+                probability *= self.probabilities[cluster.id][i]
+            probability *= cluster.probability
+            self.probabilities_unorm.append(probability)
+
+        # normalize probabilities
+        sumP = 0
+        for prob in self.probabilities_unorm:
+            sumP += prob
+        for prob in self.probabilities_unorm:
+            prob_norm = prob/sumP
+            self.probabilities_norm.append(prob_norm)
+
+    def calculateNodeL(self):
+        likelihood = 0
+        log_likelihood = 0
+        #calculate likelihood
+        for prob in self.probabilities_unorm:
+            likelihood += prob
+        self.L = likelihood
+        #calculate log likelihood
+        self.logL = math.log10(self.L)
+
+
+
+
 
 
     """
@@ -46,21 +80,7 @@ class Node:
             self.probabilities[i] = self.probabilities[i]/sumN
     """
 
-    #Gets the cluster id with highest probability and sets it
-    def bestCluster(self):
-        highest = self.probabilities[0]
-        id = 0
 
-
-
-        #Get the highest id
-        for i, prob in enumerate(self.probabilities):
-            if prob > highest :
-                highest = prob
-                id = i
-
-        #Set to the cluster with the highest probability
-        self.cluster = id
 
 
 
