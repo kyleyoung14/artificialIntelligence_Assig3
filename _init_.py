@@ -95,7 +95,7 @@ def getInitialCenters(maxList,minList,numDim,clusterCnt):
     dim_intervals = []
     for i in xrange(numDim):
         interval = maxList[i] - minList[i] / (clusterCnt - 1)
-        print "interval ", i, "= ", interval
+        #print "interval ", i, "= ", interval
         dim_intervals.append(interval)
 
     # calculate initial 'means' or cluster centers
@@ -109,7 +109,7 @@ def getInitialCenters(maxList,minList,numDim,clusterCnt):
                 cur_center[x] += dim_intervals[x]
             print i, ":", cur_center
         cluster_centers.append(copy.deepcopy(cur_center))
-    print "initial centers: ", cluster_centers
+    #print "initial centers: ", cluster_centers
     return cluster_centers
 
 #Returns a list of random centers or means for clustes
@@ -177,32 +177,20 @@ def main():
     #Get a list of variance for each dimension
     varianceList = getVarList(nodes)
 
-
-    print "MaxList: 1",maxList
-    print "MinList: 1",minList
-
     # Calculate initial centers or means
     initial_centers = getInitialCenters(maxList,minList,numDim,clusterCnt)
 
 
-    print "MaxList: 2",maxList
-    print "MinList: 2",minList
+    #Create the list of clusters
+    clusters = []
+    for id in xrange(clusterCnt):
+        meanList = initial_centers[id]
+        clusters.append(Cluster(id, numDim,meanList, varianceList))
 
-    next_center =getNextCenters(maxList,minList,numDim,clusterCnt)
+    #Create the Data Class
+    #allData = Data(nodes,clusters)
 
-
-    print(initial_centers)
-    print(next_center)
-    # #Create the list of clusters
-    # clusters = []
-    # for id in xrange(clusterCnt):
-    #     meanList = initial_centers[id]
-    #     clusters.append(Cluster(id, numDim,meanList), maxList,minList, varianceList))
-    #
-    # #Create the Data Class
-    # allData = Data(nodes,clusters)
-    #
-    # allData.ExpectedMax()
+    #allData.ExpectedMax()
 
 
 

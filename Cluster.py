@@ -1,15 +1,20 @@
 #Cluster class
-from random import random
+import random
 
 class Cluster:
-    def __init__(self, id, numDim, meanList, maxList, minList, varianceList):
+    def __init__(self, id, numDim, meanList, varianceList):
         #set the mean
         self.mean = meanList
         variance = []
+
         #set the variance
         for i in xrange(numDim):
-            randNum =  random() * 10
-            variance.append(randNum)
+            val = varianceList[i]
+            scale = random.uniform(0.8, 1.2)
+
+            curVar = val * scale
+            variance.append(curVar)
+
 
         #Take the variance of the entire distribution
         #base the variance on the nodes var/#cluster
