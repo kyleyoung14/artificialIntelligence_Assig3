@@ -21,8 +21,10 @@ class Cluster:
 
     # Update the mean and variance
     def maximize(self, nodes):
-        variance = []
+        varianceList = []
         meanList = []
+
+        # calculate new means
         for i in xrange(self.numDim):
             mean = 0
             prob = 0
@@ -33,3 +35,15 @@ class Cluster:
             mean = mean/prob
             meanList.append(mean)
         self.mean = meanList
+
+        # calculate new variance
+        for i in xrange(self.numDim):
+            square_diff = 0
+            for j in xrange(len(nodes)):
+                square_diff += (nodes[j].coordinates[i] - self.mean[i])**2
+
+            variance = square_diff / len(nodes)
+            varianceList.append(variance)
+
+        self.variance = varianceList
+
