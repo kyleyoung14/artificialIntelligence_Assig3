@@ -1,8 +1,8 @@
 from Node import Node
+from random import randint
 from Cluster import Cluster
 from Data import Data
 import copy
-
 import csv
 
 #Returns a list with the biggest coordinate value for each dimension
@@ -62,8 +62,6 @@ def getVarList(nodes):
         sampleMean = sum/numNodes
         sampleMeanList.append(sampleMean)
 
-    print(sampleMeanList)
-
     #get (x-xMean)^2
     dateMinusSampleMS= [[0 for x in range(numNodes)] for y in range(coordSize)]
     for i in xrange(coordSize):
@@ -104,7 +102,7 @@ def getInitialCenters(maxList,minList,numDim,clusterCnt):
     cluster_centers = []
     for i in xrange(clusterCnt):
         if i == 0:
-            cur_center = minList
+            cur_center = copy.deepcopy(minList)
             print i, ":", cur_center
         else:
             for x, center in enumerate(cur_center):
@@ -113,6 +111,28 @@ def getInitialCenters(maxList,minList,numDim,clusterCnt):
         cluster_centers.append(copy.deepcopy(cur_center))
     print "initial centers: ", cluster_centers
     return cluster_centers
+
+#Returns a list of random centers or means for clustes
+def getNextCenters(maxList,minList,numDim,clusterCnt):
+    cluster_center = []
+
+    #Create a list of means for each dimension for every cluster
+    for i in xrange(clusterCnt):
+        mean = []
+        for j in xrange(numDim):
+            max = int(maxList[j])
+            min = int(minList[j])
+
+            #Random center between ranges
+            cur_center = randint(min,max)
+            mean.append(cur_center)
+
+        cluster_center.append(mean)
+
+    return cluster_center
+
+
+
 
 
 
@@ -158,11 +178,21 @@ def main():
     varianceList = getVarList(nodes)
 
 
-    print "MaxList: ",maxList
-    print "MinList: ",minList
+    print "MaxList: 1",maxList
+    print "MinList: 1",minList
+
     # Calculate initial centers or means
     initial_centers = getInitialCenters(maxList,minList,numDim,clusterCnt)
 
+
+    print "MaxList: 2",maxList
+    print "MinList: 2",minList
+
+    next_center =getNextCenters(maxList,minList,numDim,clusterCnt)
+
+
+    print(initial_centers)
+    print(next_center)
     # #Create the list of clusters
     # clusters = []
     # for id in xrange(clusterCnt):
