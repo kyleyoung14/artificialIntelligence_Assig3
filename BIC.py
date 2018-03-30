@@ -15,15 +15,19 @@ class BIC:
         return result
 
     def findSmallestBIC(self):
-        Lhat = (insertwhateverEMfunctionis)(1)
-        current = calculateBIC(n, 1, Lhat)  # replace these variables later
-        currentClusters = n
+        currentResult = 999999999  # very large number to start
+        clusterCount = 1
 
-        for i in range (2, n / 2):
-            Lhat = (insertwhateverEMfunctionis)(i)
-            new = calculateBIC(n, i, Lhat)
-            if (new < current):
-                current = new
-                currentClusters = i
+        while(nextIteration == true):
+            LHat = WhateverTheEMFunctionIs(clusterCount) #THIS NEEDS TO BE UPDATED WITH THE REAL FUNCTION CALL
+            #newResult = np.log(n)*k - 2*LHat
+            newResult = calculateBIC(n, k, Lhat)
 
-        return currentClusters
+            if(currentResult - newResult > 2):  # Hey, Keep going
+                currentResult = newResult
+                newIteration = true
+                clusterCount = clusterCount + 1
+            else: # currentResult - newResult < 2, this means that it's not worth to continue
+                currentResult = newResult
+                newIteration = false
+        return clusterCount
