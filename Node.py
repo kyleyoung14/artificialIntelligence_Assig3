@@ -23,25 +23,32 @@ class Node:
             for i in xrange(cluster.numDim):
                 # calculate probability for this cluster for this dimension
                 mean = cluster.mean[i]
+                print"COORD: ",self.coordinates[i]
+                print"MEAN CALC: ",mean," CLUSTER",cluster.id
                 stddev = math.sqrt(cluster.variance[i])
                 # calculate Z value
                 # z = (self.coordinates[i] - mean)/stddev
                 # calculate prob from z value, mean, and stddev
-                p_norm = norm.pdf(self.coordinates[i],loc=mean,scale=stddev)
+                p_norm = norm(mean,stddev).cdf(self.coordinates[i])
+                if self.coordinates[i] > mean:
+                    p_norm = 1 - p_norm
                 if p_norm == 0.0:
                     p_norm = 1*10**-300
                 # update probabilities list
                 self.probabilities[cluster.id][i] = p_norm
+                print "PNORM: ",p_norm
+            print "PNORMS: ",self.probabilities[cluster.id]
 
         # calculate probability that node is from cluster (unorm)
-        probability = 1
         for cluster in clusters:
+            probability = 1
             for i in xrange(cluster.numDim):
                 probability *= self.probabilities[cluster.id][i]
             probability *= cluster.probability
             if probability == 0.0:
                 probability = 1 * 10 ** -300
             self.probabilities_unorm[cluster.id] = probability
+        print"PROB UNORM: ",self.probabilities_unorm
 
         # normalize probabilities
         sumP = 0
@@ -51,6 +58,7 @@ class Node:
         for prob in self.probabilities_unorm:
             prob_norm = prob/sumP
             self.probabilities_norm.append(prob_norm)
+        print"PROB NORM: ",self.probabilities_norm
 
     def calculateNodeL(self):
         likelihood = 0
@@ -60,7 +68,7 @@ class Node:
             likelihood += prob
         self.L = likelihood
         #calculate log likelihood
-        self.logL = math.log10(self.L)
+        self.logL = math.log(self.L)
 
 
 

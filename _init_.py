@@ -94,12 +94,13 @@ def getInitialCenters(maxList,minList,numDim,clusterCnt):
     # used for cluster mean initialization
     dim_intervals = []
     for i in xrange(numDim):
-        interval = maxList[i] - minList[i] / (clusterCnt - 1)
+        interval = (maxList[i] - minList[i]) / (clusterCnt - 1)
         #print "interval ", i, "= ", interval
         dim_intervals.append(interval)
 
     # calculate initial 'means' or cluster centers
     cluster_centers = []
+    print "INITIAL CENTERS"
     for i in xrange(clusterCnt):
         if i == 0:
             cur_center = copy.deepcopy(minList)
@@ -111,6 +112,7 @@ def getInitialCenters(maxList,minList,numDim,clusterCnt):
         cluster_centers.append(copy.deepcopy(cur_center))
     #print "initial centers: ", cluster_centers
     return cluster_centers
+
 
 #Returns a list of random centers or means for clustes
 def getNextCenters(maxList,minList,numDim,clusterCnt):
@@ -147,7 +149,7 @@ def main():
     #dataFile = raw_input("Input data file name: ")
     dataFile = "sample_EM_data.csv"
     clusterCnt = int(raw_input("Number of clusters: "))
-    restartNum = 10
+    restartNum = 1
 
     #Extract from CSV file
     file = open(dataFile)
@@ -159,6 +161,7 @@ def main():
     numDim = 0
 
     data = []
+
 
     # Random restarts
     for xx in xrange(restartNum):
@@ -201,6 +204,8 @@ def main():
 
         # if(len(data) < 1 or ):
         data.append(newData)
+
+
 
     maxLogL = -1000000
     for i in xrange(len(data)):
