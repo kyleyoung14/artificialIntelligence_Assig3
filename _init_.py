@@ -153,10 +153,10 @@ def main():
     print("Running EM")
 
     # Input
-    #dataFile = raw_input("Input data file name: ")
-    dataFile = "sample_EM_data.csv"
+    dataFile = raw_input("Input data file name: ")
+    #dataFile = "sample_EM_data.csv"
     clusterCnt = raw_input("Number of clusters: ")
-    restartNum = 1
+    restartNum = 10
 
     #Extract from CSV file
     file = open(dataFile)
