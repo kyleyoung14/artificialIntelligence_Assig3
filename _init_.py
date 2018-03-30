@@ -4,6 +4,7 @@ from Cluster import Cluster
 from Data import Data
 import copy
 import csv
+import numpy as np
 
 #Returns a list with the biggest coordinate value for each dimension
 def getMaxList(nodes):
@@ -134,22 +135,25 @@ def getNextCenters(maxList,minList,numDim,clusterCnt):
     return cluster_center
 
 
+# PART 2 Code
+def calculateBIC(self, n, k, Lhat):
+    result = np.log(n)*k - 2 * Lhat  # Lhat is already the log of the likelihood
+    return result
 
 
 
 
 
 
-
-#Main Function
+############## Main Function ##################
 def main():
     print("Running EM")
 
     # Input
     #dataFile = raw_input("Input data file name: ")
     dataFile = "sample_EM_data.csv"
-    clusterCnt = int(raw_input("Number of clusters: "))
-    restartNum = 15
+    clusterCnt = raw_input("Number of clusters: ")
+    restartNum = 10
 
     #Extract from CSV file
     file = open(dataFile)
@@ -163,65 +167,158 @@ def main():
     data = []
 
 
-    # Random restarts
-    for xx in xrange(restartNum):
-        #Create Nodes
-        for row in csv_file:
-            coordinates = []
+    ###### BIC OR NOT #######
+    if clusterCnt == 'X':
+        # RUN BIC
+        currentResult = 999999999  # very large number to start
+        clusterCount = 1
+        newIteration = True
 
-            #Convert the strings to floats
-            for i in row:
-                coordinates.append(float(i))
+        while (newIteration == True):
+            # RUN EM
+            clusterCnt = clusterCount
+            # Random restarts
+            for xx in xrange(restartNum):
+                # Create Nodes
+                for row in csv_file:
+                    coordinates = []
 
-            numDim = len(row)
+                    # Convert the strings to floats
+                    for i in row:
+                        coordinates.append(float(i))
 
-            nodes.append(Node(coordinates,clusterCnt,numDim))
-            # print(coordinates)
+                    numDim = len(row)
 
-        #Get the max and min from the nodes
-        maxList = getMaxList(nodes)
-        minList = getMinList(nodes)
+                    nodes.append(Node(coordinates, clusterCnt, numDim))
+                    # print(coordinates)
 
-        #Get a list of variance for each dimension
-        varianceList = getVarList(nodes)
+                # Get the max and min from the nodes
+                maxList = getMaxList(nodes)
+                minList = getMinList(nodes)
 
-        # Calculate initial centers or means
-        if xx == 0:
-            initial_centers = getInitialCenters(maxList,minList,numDim,clusterCnt)
-        else:
-            initial_centers = getNextCenters(maxList,minList,numDim,clusterCnt)
+                # Get a list of variance for each dimension
+                varianceList = getVarList(nodes)
 
-        # calculate initial cluster probability
-        probability = 1/float(clusterCnt)
+                # Calculate initial centers or means
+                if xx == 0:
+                    initial_centers = getInitialCenters(maxList, minList, numDim, clusterCnt)
+                else:
+                    initial_centers = getNextCenters(maxList, minList, numDim, clusterCnt)
 
-        #Create the list of clusters
-        clusters = []
-        for id in xrange(clusterCnt):
-            meanList = initial_centers[id]
-            clusters.append(Cluster(id, numDim,meanList, varianceList, probability))
+                # calculate initial cluster probability
+                probability = 1 / float(clusterCnt)
 
-        #Create the Data Class
-        allData = Data(nodes,clusters)
+                # Create the list of clusters
+                clusters = []
+                for id in xrange(clusterCnt):
+                    meanList = initial_centers[id]
+                    clusters.append(Cluster(id, numDim, meanList, varianceList, probability))
 
-        newData = allData.ExpectedMax()
+                # Create the Data Class
+                allData = Data(nodes, clusters)
 
-        # if(len(data) < 1 or ):
-        data.append(newData)
+                newData = allData.ExpectedMax()
+
+                # if(len(data) < 1 or ):
+                data.append(newData)
+
+            maxLogL = -1000000
+            for i in xrange(len(data)):
+                if maxLogL < data[i].logL[len(data[i].logL) - 1]:
+                    maxInd = i
+                    maxLogL = data[i].logL[len(data[i].logL) - 1]
+
+            finalData = data[maxInd]
+            #print"\n---------RESULTS----------"
+            #print('There were ' + str(len(finalData.clusters)) + ' clusters.')
+            #print('Run ' + str(maxInd) + ' had the greatest log likelihood at ' + str(maxLogL))
+            #for i in xrange(len(finalData.clusters)):
+                #print "CLUSTER ", i, ":", "Mean =", finalData.clusters[i].mean, "  Variance =", finalData.clusters[
+                    #i].variance
+
+            # BIC CALCULATION
+            Lhat = maxLogL
+            newResult = calculateBIC(len(nodes), clusterCount, Lhat)
+
+            if (currentResult - newResult > 2):  # Hey, Keep going
+                currentResult = newResult
+                newIteration = True
+                clusterCount = clusterCount + 1
+            else:  # currentResult - newResult < 2, this means that it's not worth to continue
+                currentResult = newResult
+                newIteration = False
+
+        print"\n---------RESULTS----------"
+        print('There were ' + str(len(finalData.clusters)) + ' clusters.')
+        print('Run ' + str(maxInd) + ' had the greatest log likelihood at ' + str(maxLogL))
+        for i in xrange(len(finalData.clusters)):
+            print "CLUSTER ", i, ":", "Mean =", finalData.clusters[i].mean, "  Variance =", finalData.clusters[i].variance
+        print"BIC = ",currentResult
+
+
+    else:
+        # NORMAL EM
+        clusterCnt = int(clusterCnt)
+
+        # Random restarts
+        for xx in xrange(restartNum):
+            #Create Nodes
+            for row in csv_file:
+                coordinates = []
+
+                #Convert the strings to floats
+                for i in row:
+                    coordinates.append(float(i))
+
+                numDim = len(row)
+
+                nodes.append(Node(coordinates,clusterCnt,numDim))
+                # print(coordinates)
+
+            #Get the max and min from the nodes
+            maxList = getMaxList(nodes)
+            minList = getMinList(nodes)
+
+            #Get a list of variance for each dimension
+            varianceList = getVarList(nodes)
+
+            # Calculate initial centers or means
+            if xx == 0:
+                initial_centers = getInitialCenters(maxList,minList,numDim,clusterCnt)
+            else:
+                initial_centers = getNextCenters(maxList,minList,numDim,clusterCnt)
+
+            # calculate initial cluster probability
+            probability = 1/float(clusterCnt)
+
+            #Create the list of clusters
+            clusters = []
+            for id in xrange(clusterCnt):
+                meanList = initial_centers[id]
+                clusters.append(Cluster(id, numDim,meanList, varianceList, probability))
+
+            #Create the Data Class
+            allData = Data(nodes,clusters)
+
+            newData = allData.ExpectedMax()
+
+            # if(len(data) < 1 or ):
+            data.append(newData)
 
 
 
-    maxLogL = -1000000
-    for i in xrange(len(data)):
-        if maxLogL < data[i].logL[len(data[i].logL)-1]:
-            maxInd = i
-            maxLogL = data[i].logL[len(data[i].logL)-1]
+        maxLogL = -1000000
+        for i in xrange(len(data)):
+            if maxLogL < data[i].logL[len(data[i].logL)-1]:
+                maxInd = i
+                maxLogL = data[i].logL[len(data[i].logL)-1]
 
-    finalData = data[maxInd]
-    print"\n---------RESULTS----------"
-    print('There were ' + str(len(finalData.clusters)) + ' clusters.')
-    print('Run ' + str(maxInd) + ' had the greatest log likelihood at ' + str(maxLogL))
-    for i in xrange(len(finalData.clusters)):
-        print "CLUSTER ",i, ":", "Mean =", finalData.clusters[i].mean, "  Variance =", finalData.clusters[i].variance
+        finalData = data[maxInd]
+        print"\n---------RESULTS----------"
+        print('There were ' + str(len(finalData.clusters)) + ' clusters.')
+        print('Run ' + str(maxInd) + ' had the greatest log likelihood at ' + str(maxLogL))
+        for i in xrange(len(finalData.clusters)):
+            print "CLUSTER ",i, ":", "Mean =", finalData.clusters[i].mean, "  Variance =", finalData.clusters[i].variance
 
 
 
