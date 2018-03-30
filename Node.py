@@ -1,4 +1,5 @@
 import math
+import numpy as np
 from scipy.stats import norm
 
 #The class node holds info about the data points
@@ -23,8 +24,8 @@ class Node:
             for i in xrange(cluster.numDim):
                 # calculate probability for this cluster for this dimension
                 mean = cluster.mean[i]
-                print"COORD: ",self.coordinates[i]
-                print"MEAN CALC: ",mean," CLUSTER",cluster.id
+                # print"COORD: ",self.coordinates[i]
+                # print"MEAN CALC: ",mean," CLUSTER",cluster.id
                 stddev = math.sqrt(cluster.variance[i])
                 # calculate Z value
                 # z = (self.coordinates[i] - mean)/stddev
@@ -36,8 +37,8 @@ class Node:
                     p_norm = 1*10**-300
                 # update probabilities list
                 self.probabilities[cluster.id][i] = p_norm
-                print "PNORM: ",p_norm
-            print "PNORMS: ",self.probabilities[cluster.id]
+                # print "PNORM: ",p_norm
+            # print "PNORMS: ",self.probabilities[cluster.id]
 
         # calculate probability that node is from cluster (unorm)
         for cluster in clusters:
@@ -48,7 +49,7 @@ class Node:
             if probability == 0.0:
                 probability = 1 * 10 ** -300
             self.probabilities_unorm[cluster.id] = probability
-        print"PROB UNORM: ",self.probabilities_unorm
+        # print"PROB UNORM: ",self.probabilities_unorm
 
         # normalize probabilities
         sumP = 0
@@ -58,7 +59,7 @@ class Node:
         for prob in self.probabilities_unorm:
             prob_norm = prob/sumP
             self.probabilities_norm.append(prob_norm)
-        print"PROB NORM: ",self.probabilities_norm
+        # print"PROB NORM: ",self.probabilities_norm
 
     def calculateNodeL(self):
         likelihood = 0
@@ -68,7 +69,7 @@ class Node:
             likelihood += prob
         self.L = likelihood
         #calculate log likelihood
-        self.logL = math.log(self.L)
+        self.logL = np.log(self.L)
 
 
 

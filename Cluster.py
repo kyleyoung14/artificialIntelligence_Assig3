@@ -31,7 +31,7 @@ class Cluster:
         meanList = []
 
         # calculate new means
-        print"Old Means: ","cluster",self.id," :",self.mean
+        # print"Old Means: ","cluster",self.id," :",self.mean
         for i in xrange(self.numDim):
             mean = 0.0
             prob = 0.0
@@ -43,20 +43,21 @@ class Cluster:
             meanList.append(mean)
         self.mean = meanList
 
-        print"New Means: ","cluster",self.id," :",self.mean
+        # print"New Means: ","cluster",self.id," :",self.mean
 
         # calculate new variance
         for i in xrange(self.numDim):
             square_diff = 0
-            mean = 0
-            prob = 0
+            var_sum = 0
+            c_psum = 0
             for j in xrange(len(nodes)):
-                square_diff += (nodes[j].coordinates[i] - self.mean[i])**2
-                # mean += nodes[j].coordinates[i] * nodes[j].probabilities_norm[self.id]
-                # prob += nodes[j].probabilities_norm[self.id]
+                square_diff = (nodes[j].coordinates[i] - self.mean[i])**2
+                prob = nodes[j].probabilities_norm[self.id]
+                c_psum += prob
+                var_sum += square_diff * prob
 
             # variance = square_diff * mean / prob
-            variance = (square_diff * self.mean[i]) / (len(nodes)-1)
+            variance = var_sum / c_psum
             varianceList.append(variance)
 
             self.variance = varianceList
