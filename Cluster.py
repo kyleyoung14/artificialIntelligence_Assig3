@@ -32,8 +32,8 @@ class Cluster:
 
         # calculate new means
         for i in xrange(self.numDim):
-            mean = 0
-            prob = 0
+            mean = 0.0
+            prob = 0.0
             for j in xrange(len(nodes)):
                 mean += nodes[j].coordinates[i] * nodes[j].probabilities_norm[self.id]
                 prob += nodes[j].probabilities_norm[self.id]
@@ -49,10 +49,11 @@ class Cluster:
             prob = 0
             for j in xrange(len(nodes)):
                 square_diff += (nodes[j].coordinates[i] - self.mean[i])**2
-                mean += nodes[j].coordinates[i] * nodes[j].probabilities_norm[self.id]
-                prob += nodes[j].probabilities_norm[self.id]
+                # mean += nodes[j].coordinates[i] * nodes[j].probabilities_norm[self.id]
+                # prob += nodes[j].probabilities_norm[self.id]
 
-            variance = square_diff * mean / prob
+            # variance = square_diff * mean / prob
+            variance = (square_diff * self.mean[i]) / (len(nodes)-1)
             varianceList.append(variance)
 
             self.variance = varianceList

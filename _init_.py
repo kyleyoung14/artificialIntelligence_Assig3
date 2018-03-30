@@ -145,8 +145,9 @@ def main():
 
     # Input
     #dataFile = raw_input("Input data file name: ")
-    dataFile = "sample_EM_data2.csv"
+    dataFile = "sample_EM_data.csv"
     clusterCnt = int(raw_input("Number of clusters: "))
+    restartNum = 10
 
     #Extract from CSV file
     file = open(dataFile)
@@ -157,42 +158,62 @@ def main():
 
     numDim = 0
 
-    #Create Nodes
-    for row in csv_file:
-        coordinates = []
+    data = []
 
-        #Convert the strings to floats
-        for i in row:
-            coordinates.append(float(i))
-        
-        numDim = len(row)
+    # Random restarts
+    for xx in xrange(restartNum):
+        #Create Nodes
+        for row in csv_file:
+            coordinates = []
 
-        nodes.append(Node(coordinates,clusterCnt,numDim))
-        print(coordinates)
+            #Convert the strings to floats
+            for i in row:
+                coordinates.append(float(i))
 
-    #Get the max and min from the nodes
-    maxList = getMaxList(nodes)
-    minList = getMinList(nodes)
+            numDim = len(row)
 
-    #Get a list of variance for each dimension
-    varianceList = getVarList(nodes)
+            nodes.append(Node(coordinates,clusterCnt,numDim))
+            # print(coordinates)
 
-    # Calculate initial centers or means
-    initial_centers = getInitialCenters(maxList,minList,numDim,clusterCnt)
+        #Get the max and min from the nodes
+        maxList = getMaxList(nodes)
+        minList = getMinList(nodes)
 
-    # calculate initial cluster probability
-    probability = 1/clusterCnt
+        #Get a list of variance for each dimension
+        varianceList = getVarList(nodes)
 
-    #Create the list of clusters
-    clusters = []
-    for id in xrange(clusterCnt):
-        meanList = initial_centers[id]
-        clusters.append(Cluster(id, numDim,meanList, varianceList, probability))
+        # Calculate initial centers or means
+        initial_centers = getInitialCenters(maxList,minList,numDim,clusterCnt)
 
-    #Create the Data Class
-    #allData = Data(nodes,clusters)
+        # calculate initial cluster probability
+        probability = 1/float(clusterCnt)
 
-    #allData.ExpectedMax()
+        #Create the list of clusters
+        clusters = []
+        for id in xrange(clusterCnt):
+            meanList = initial_centers[id]
+            clusters.append(Cluster(id, numDim,meanList, varianceList, probability))
+
+        #Create the Data Class
+        allData = Data(nodes,clusters)
+
+        newData = allData.ExpectedMax()
+
+        # if(len(data) < 1 or ):
+        data.append(newData)
+
+    maxLogL = -1000000
+    for i in xrange(len(data)):
+        if maxLogL < data[i].logL[len(data[i].logL)-1]:
+            maxInd = i
+            maxLogL = data[i].logL[len(data[i].logL)-1]
+
+    finalData = data[maxInd]
+    print('There were ' + str(len(finalData.clusters)) + ' clusters.')
+    print('Run ' + str(maxInd) + ' had the greatest log likelihood at ' + str(maxLogL))
+    for i in xrange(len(finalData.clusters)):
+        print i, ":", "Mean =", finalData.clusters[i].mean, "  Variance =", finalData.clusters[i].variance
+
 
 
 

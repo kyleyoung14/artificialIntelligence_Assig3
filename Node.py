@@ -5,9 +5,11 @@ from scipy.stats import norm
 class Node:
     def __init__(self, coordinates, clusterNum, numDim):
         self.coordinates = coordinates
-        self.probabilities = [0] * clusterNum
-        for cluster in self.probabilities:
-            cluster = [0] * numDim
+        self.probabilities = [[] for x in xrange(clusterNum)]
+        for i in xrange(clusterNum):
+            for j in xrange(numDim):
+                self.probabilities[i].append(0)
+            # cluster = [0] * numDim
         self.probabilities_unorm = [0] * clusterNum
         self.probabilities_norm = [0] * clusterNum
         self.L = 0
@@ -20,11 +22,14 @@ class Node:
         for cluster in clusters:
             for i in xrange(cluster.numDim):
                 # calculate probability for this cluster for this dimension
-                mean = cluster.meanList[i]
-                stddev = math.sqrt(cluster.varianceList[i])
-                p = (self.coordinates[i] - mean)/stddev
-                # normalize
-                p_norm = norm.ppf(p,loc=mean,scale=stddev)
+                mean = cluster.mean[i]
+                stddev = math.sqrt(cluster.variance[i])
+                # calculate Z value
+                # z = (self.coordinates[i] - mean)/stddev
+                # calculate prob from z value, mean, and stddev
+                p_norm = norm.pdf(self.coordinates[i],loc=mean,scale=stddev)
+                if p_norm == 0.0:
+                    p_norm = 1*10**-300
                 # update probabilities list
                 self.probabilities[cluster.id][i] = p_norm
 
@@ -34,10 +39,13 @@ class Node:
             for i in xrange(cluster.numDim):
                 probability *= self.probabilities[cluster.id][i]
             probability *= cluster.probability
-            self.probabilities_unorm.append(probability)
+            if probability == 0.0:
+                probability = 1 * 10 ** -300
+            self.probabilities_unorm[cluster.id] = probability
 
         # normalize probabilities
         sumP = 0
+        self.probabilities_norm = []
         for prob in self.probabilities_unorm:
             sumP += prob
         for prob in self.probabilities_unorm:
