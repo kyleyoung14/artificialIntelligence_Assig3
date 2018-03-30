@@ -1,3 +1,5 @@
+import numpy as np
+
 # Holds all the information to perform EM data points and clusters
 class Data:
     def __init__(self, nodes, clusters):

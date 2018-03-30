@@ -130,7 +130,7 @@ def getNextCenters(maxList,minList,numDim,clusterCnt):
             mean.append(cur_center)
 
         cluster_center.append(mean)
-
+    print "INITIAL CENTERS: ",cluster_center
     return cluster_center
 
 
@@ -149,7 +149,7 @@ def main():
     #dataFile = raw_input("Input data file name: ")
     dataFile = "sample_EM_data.csv"
     clusterCnt = int(raw_input("Number of clusters: "))
-    restartNum = 1
+    restartNum = 15
 
     #Extract from CSV file
     file = open(dataFile)
@@ -186,7 +186,10 @@ def main():
         varianceList = getVarList(nodes)
 
         # Calculate initial centers or means
-        initial_centers = getInitialCenters(maxList,minList,numDim,clusterCnt)
+        if xx == 0:
+            initial_centers = getInitialCenters(maxList,minList,numDim,clusterCnt)
+        else:
+            initial_centers = getNextCenters(maxList,minList,numDim,clusterCnt)
 
         # calculate initial cluster probability
         probability = 1/float(clusterCnt)
@@ -214,10 +217,11 @@ def main():
             maxLogL = data[i].logL[len(data[i].logL)-1]
 
     finalData = data[maxInd]
+    print"\n---------RESULTS----------"
     print('There were ' + str(len(finalData.clusters)) + ' clusters.')
     print('Run ' + str(maxInd) + ' had the greatest log likelihood at ' + str(maxLogL))
     for i in xrange(len(finalData.clusters)):
-        print i, ":", "Mean =", finalData.clusters[i].mean, "  Variance =", finalData.clusters[i].variance
+        print "CLUSTER ",i, ":", "Mean =", finalData.clusters[i].mean, "  Variance =", finalData.clusters[i].variance
 
 
 
