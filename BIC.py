@@ -11,12 +11,12 @@ class BIC:
     # Lhat is the resulting likelihood of the model with k clusters
 
     def calculateBIC(self, n, k, Lhat):
-        result = np.log(n)*k - 2 * np.log(Lhat)
+        result = np.log(n)*k - 2 * Lhat  # Lhat is already the log of the likelihood
         return result
 
     def findSmallestBIC(self):
         Lhat = (insertwhateverEMfunctionis)(1)
-        current = calculateBIC(n, 1, Lhat) #replace these variables later
+        current = calculateBIC(n, 1, Lhat)  # replace these variables later
         currentClusters = n
 
         for i in range (2, n / 2):
