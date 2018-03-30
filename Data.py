@@ -1,4 +1,6 @@
 import numpy as np
+import matplotlib.pyplot as plt
+
 
 # Holds all the information to perform EM data points and clusters
 class Data:
@@ -54,12 +56,34 @@ class Data:
         thresh = 3 # threshold for when to stop EM
         first = True
         size = len(self.logL)
+
+        # plot LL vs iterations
+        x = []
+        y = []
+        #counter = 1
+        #while (counter < 20):
+
         while(first or self.logL[size-1]-self.logL[size-2] > thresh):
+
             self.setAllNodeProb()
             self.updateClusters()
             self.updateLikelihood()
             size = len(self.logL)
             print('Last Log Likelihood = ' + str(self.logL[size-2]) + ', New Log Likelihood = ' + str(self.logL[size-1]))
             first = False
+
+            # plotting code
+            #x.append(counter)
+            #y.append(self.logL[size-1])
+            #counter+=1
+
+
+        # plot graph
+        #plt.plot(x, y)
+        #plt.xlabel('# iterations')
+        #plt.ylabel('Log-Likelihood')
+        #plt.title('Iterations vs Log-Likehood')
+        #plt.show()
+
         return self
 

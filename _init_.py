@@ -95,7 +95,10 @@ def getInitialCenters(maxList,minList,numDim,clusterCnt):
     # used for cluster mean initialization
     dim_intervals = []
     for i in xrange(numDim):
-        interval = (maxList[i] - minList[i]) / (clusterCnt - 1)
+        if clusterCnt == 1:
+            interval = 0
+        else:
+            interval = (maxList[i] - minList[i]) / (clusterCnt - 1)
         #print "interval ", i, "= ", interval
         dim_intervals.append(interval)
 
@@ -136,7 +139,7 @@ def getNextCenters(maxList,minList,numDim,clusterCnt):
 
 
 # PART 2 Code
-def calculateBIC(self, n, k, Lhat):
+def calculateBIC(n, k, Lhat):
     result = np.log(n)*k - 2 * Lhat  # Lhat is already the log of the likelihood
     return result
 
@@ -153,7 +156,7 @@ def main():
     #dataFile = raw_input("Input data file name: ")
     dataFile = "sample_EM_data.csv"
     clusterCnt = raw_input("Number of clusters: ")
-    restartNum = 10
+    restartNum = 1
 
     #Extract from CSV file
     file = open(dataFile)
