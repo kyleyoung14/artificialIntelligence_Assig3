@@ -1,8 +1,8 @@
 from Node import Node
+from random import randint
 from Cluster import Cluster
 from Data import Data
 import copy
-
 import csv
 
 #Returns a list with the biggest coordinate value for each dimension
@@ -62,8 +62,6 @@ def getVarList(nodes):
         sampleMean = sum/numNodes
         sampleMeanList.append(sampleMean)
 
-    print(sampleMeanList)
-
     #get (x-xMean)^2
     dateMinusSampleMS= [[0 for x in range(numNodes)] for y in range(coordSize)]
     for i in xrange(coordSize):
@@ -96,23 +94,47 @@ def getInitialCenters(maxList,minList,numDim,clusterCnt):
     # used for cluster mean initialization
     dim_intervals = []
     for i in xrange(numDim):
-        interval = maxList[i] - minList[i] / (clusterCnt - 1)
-        print "interval ", i, "= ", interval
+        interval = (maxList[i] - minList[i]) / (clusterCnt - 1)
+        #print "interval ", i, "= ", interval
         dim_intervals.append(interval)
 
     # calculate initial 'means' or cluster centers
     cluster_centers = []
+    print "INITIAL CENTERS"
     for i in xrange(clusterCnt):
         if i == 0:
-            cur_center = minList
+            cur_center = copy.deepcopy(minList)
             print i, ":", cur_center
         else:
             for x, center in enumerate(cur_center):
                 cur_center[x] += dim_intervals[x]
             print i, ":", cur_center
         cluster_centers.append(copy.deepcopy(cur_center))
-    print "initial centers: ", cluster_centers
+    #print "initial centers: ", cluster_centers
     return cluster_centers
+
+
+#Returns a list of random centers or means for clustes
+def getNextCenters(maxList,minList,numDim,clusterCnt):
+    cluster_center = []
+
+    #Create a list of means for each dimension for every cluster
+    for i in xrange(clusterCnt):
+        mean = []
+        for j in xrange(numDim):
+            max = int(maxList[j])
+            min = int(minList[j])
+
+            #Random center between ranges
+            cur_center = randint(min,max)
+            mean.append(cur_center)
+
+        cluster_center.append(mean)
+
+    return cluster_center
+
+
+
 
 
 
@@ -125,8 +147,9 @@ def main():
 
     # Input
     #dataFile = raw_input("Input data file name: ")
-    dataFile = "sample_EM_data2.csv"
+    dataFile = "sample_EM_data.csv"
     clusterCnt = int(raw_input("Number of clusters: "))
+    restartNum = 1
 
     #Extract from CSV file
     file = open(dataFile)
@@ -137,42 +160,65 @@ def main():
 
     numDim = 0
 
-    #Create Nodes
-    for row in csv_file:
-        coordinates = []
-
-        #Convert the strings to floats
-        for i in row:
-            coordinates.append(float(i))
-        
-        numDim = len(row)
-
-        nodes.append(Node(coordinates,clusterCnt,numDim))
-        print(coordinates)
-
-    #Get the max and min from the nodes
-    maxList = getMaxList(nodes)
-    minList = getMinList(nodes)
-
-    #Get a list of variance for each dimension
-    varianceList = getVarList(nodes)
+    data = []
 
 
-    print "MaxList: ",maxList
-    print "MinList: ",minList
-    # Calculate initial centers or means
-    initial_centers = getInitialCenters(maxList,minList,numDim,clusterCnt)
+    # Random restarts
+    for xx in xrange(restartNum):
+        #Create Nodes
+        for row in csv_file:
+            coordinates = []
 
-    # #Create the list of clusters
-    # clusters = []
-    # for id in xrange(clusterCnt):
-    #     meanList = initial_centers[id]
-    #     clusters.append(Cluster(id, numDim,meanList), maxList,minList, varianceList))
-    #
-    # #Create the Data Class
-    # allData = Data(nodes,clusters)
-    #
-    # allData.ExpectedMax()
+            #Convert the strings to floats
+            for i in row:
+                coordinates.append(float(i))
+
+            numDim = len(row)
+
+            nodes.append(Node(coordinates,clusterCnt,numDim))
+            # print(coordinates)
+
+        #Get the max and min from the nodes
+        maxList = getMaxList(nodes)
+        minList = getMinList(nodes)
+
+        #Get a list of variance for each dimension
+        varianceList = getVarList(nodes)
+
+        # Calculate initial centers or means
+        initial_centers = getInitialCenters(maxList,minList,numDim,clusterCnt)
+
+        # calculate initial cluster probability
+        probability = 1/float(clusterCnt)
+
+        #Create the list of clusters
+        clusters = []
+        for id in xrange(clusterCnt):
+            meanList = initial_centers[id]
+            clusters.append(Cluster(id, numDim,meanList, varianceList, probability))
+
+        #Create the Data Class
+        allData = Data(nodes,clusters)
+
+        newData = allData.ExpectedMax()
+
+        # if(len(data) < 1 or ):
+        data.append(newData)
+
+
+
+    maxLogL = -1000000
+    for i in xrange(len(data)):
+        if maxLogL < data[i].logL[len(data[i].logL)-1]:
+            maxInd = i
+            maxLogL = data[i].logL[len(data[i].logL)-1]
+
+    finalData = data[maxInd]
+    print('There were ' + str(len(finalData.clusters)) + ' clusters.')
+    print('Run ' + str(maxInd) + ' had the greatest log likelihood at ' + str(maxLogL))
+    for i in xrange(len(finalData.clusters)):
+        print i, ":", "Mean =", finalData.clusters[i].mean, "  Variance =", finalData.clusters[i].variance
+
 
 
 

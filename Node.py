@@ -5,24 +5,74 @@ from scipy.stats import norm
 class Node:
     def __init__(self, coordinates, clusterNum, numDim):
         self.coordinates = coordinates
-        self.probabilities = [0] * clusterNum
-        for cluster in self.probabilities:
-            cluster = [0] * numDim
-        self.cluster = 0
+        self.probabilities = [[] for x in xrange(clusterNum)]
+        for i in xrange(clusterNum):
+            for j in xrange(numDim):
+                self.probabilities[i].append(0)
+            # cluster = [0] * numDim
+        self.probabilities_unorm = [0] * clusterNum
+        self.probabilities_norm = [0] * clusterNum
+        self.L = 0
+        self.logL = 0
 
     #Does the math to check what is the probability that this nodes belongs to the given cluster
     def probFrom(self, clusters):
-        # print("Checking the probability this node comes from cluster " + str(cluster.id))
-        for n, cluster in enumerate(clusters):
+
+        # calculate probability that node is in this cluster per dimension
+        for cluster in clusters:
             for i in xrange(cluster.numDim):
                 # calculate probability for this cluster for this dimension
-                mean = cluster.meanList[i]
-                stddev = math.sqrt(cluster.varianceList[i])
-                p = (self.coordinates[i] - mean)/stddev
-                # normalize
-                p_norm = norm.ppf(p,loc=mean,scale=stddev)
+                mean = cluster.mean[i]
+                print"COORD: ",self.coordinates[i]
+                print"MEAN CALC: ",mean," CLUSTER",cluster.id
+                stddev = math.sqrt(cluster.variance[i])
+                # calculate Z value
+                # z = (self.coordinates[i] - mean)/stddev
+                # calculate prob from z value, mean, and stddev
+                p_norm = norm(mean,stddev).cdf(self.coordinates[i])
+                if self.coordinates[i] > mean:
+                    p_norm = 1 - p_norm
+                if p_norm == 0.0:
+                    p_norm = 1*10**-300
                 # update probabilities list
-                self.probabilities[n][i] = p_norm
+                self.probabilities[cluster.id][i] = p_norm
+                print "PNORM: ",p_norm
+            print "PNORMS: ",self.probabilities[cluster.id]
+
+        # calculate probability that node is from cluster (unorm)
+        for cluster in clusters:
+            probability = 1
+            for i in xrange(cluster.numDim):
+                probability *= self.probabilities[cluster.id][i]
+            probability *= cluster.probability
+            if probability == 0.0:
+                probability = 1 * 10 ** -300
+            self.probabilities_unorm[cluster.id] = probability
+        print"PROB UNORM: ",self.probabilities_unorm
+
+        # normalize probabilities
+        sumP = 0
+        self.probabilities_norm = []
+        for prob in self.probabilities_unorm:
+            sumP += prob
+        for prob in self.probabilities_unorm:
+            prob_norm = prob/sumP
+            self.probabilities_norm.append(prob_norm)
+        print"PROB NORM: ",self.probabilities_norm
+
+    def calculateNodeL(self):
+        likelihood = 0
+        log_likelihood = 0
+        #calculate likelihood
+        for prob in self.probabilities_unorm:
+            likelihood += prob
+        self.L = likelihood
+        #calculate log likelihood
+        self.logL = math.log(self.L)
+
+
+
+
 
 
     """
@@ -46,21 +96,7 @@ class Node:
             self.probabilities[i] = self.probabilities[i]/sumN
     """
 
-    #Gets the cluster id with highest probability and sets it
-    def bestCluster(self):
-        highest = self.probabilities[0]
-        id = 0
 
-
-
-        #Get the highest id
-        for i, prob in enumerate(self.probabilities):
-            if prob > highest :
-                highest = prob
-                id = i
-
-        #Set to the cluster with the highest probability
-        self.cluster = id
 
 
 
